@@ -167,18 +167,54 @@ class FairOs(object):
         # print(uri)
         response = self._http_request(url=self.basic_url+uri, headers=self.http_headers, request_type='get')
         return response.json()
-
-    def dir_ls(self, dir_path):
-        uri = '/v1/dir/ls'
+    
+    def dir_mkdir(self, pod_name,dir_path):
+        """
+        {'message': 'directory created successfully', 'code': 201}
+        """
+        uri = '/v1/dir/mkdir'
 
         data = {
-            'dir': (None,dir_path)
+            'pod_name': pod_name,
+            'dir_path': dir_path
         }
         
         headers = {
             'Cookie': self.login_cookie,
             'Content-Type':'multipart/form-data',
         }
-        response = self._http_request(url=self.basic_url+uri,json=data, headers=headers, request_type='get')
+        response = self._http_request(url=self.basic_url+uri,json=data, headers=self.http_headers, request_type='post')
+
+        return response.json()
+
+    def dir_ls(self,pod_name,dir_path):
+        uri = f'/v1/dir/ls?pod_name={pod_name}&dir_path={dir_path}'
+
+        # data = {
+        #     'dir_path': (None,dir_path),
+        #     'pod_name': (None,pod_name)
+        # }
+        
+        headers = {
+            'Cookie': self.login_cookie,
+            'Content-Type':'multipart/form-data',
+        }
+        response = self._http_request(url=self.basic_url+uri,json={}, headers=self.http_headers, request_type='get')
+
+        return response.json()
+    
+    def dir_stat(self, pod_name, dir_path):
+        """
+        {'pod_name': 'pod_test_1', 'dir_path': '/', 'dir_name': 'data', 'creation_time': '1646812872', 'modification_time': '1646812872', 'access_time': '1646812872', 'no_of_directories': '0', 'no_of_files': '0'}
+        """
+
+        uri = f'/v1/dir/stat?pod_name={pod_name}&dir_path={dir_path}'
+
+        # data = {
+        #     'dir_path': (None,dir_path),
+        #     'pod_name': (None,pod_name)
+        # }
+    
+        response = self._http_request(url=self.basic_url+uri,json={}, headers=self.http_headers, request_type='get')
 
         return response.json()
