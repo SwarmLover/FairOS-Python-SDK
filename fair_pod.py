@@ -29,8 +29,21 @@ class FairPod(object):
 
         return result
     
-    def ls_pod(self):
+    
+    def sync_pod(self, pod_name:str):
+        
+        return self.fair_os.pod_sync(pod_name)
+    
+    def close_pod(self, pod_name:str):
 
+        return self.fair_os.pod_close(pod_name)
+    
+    def delete_pod(self, pod_name:str):
+
+        return self.fair_os.pod_delete(pod_name=pod_name, passwd=self.passwd)
+    
+    def ls_pod(self):
+    
         return self.fair_os.pod_ls()
 
     def stat_pod(self, pod_name:str):
