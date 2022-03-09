@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from email import header
 import requests
-import json
 
 
 class FairOs(object):
 
-    def __init__(self) -> None:
+    def __init__(self, basic_url='http://localhost:9090', time_out=20) -> None:
         pass
-        self.time_out = 20
-        self.basic_url = 'http://localhost:9090'
+        self.time_out = time_out
+        self.basic_url = basic_url
         self.http_headers = {
             'Content-Type': 'application/json'
         }
@@ -65,12 +63,18 @@ class FairOs(object):
         self.http_headers.update({'Cookie': login_cookie})
         
         return response.json()
+    
+    def user_is_loggined(self, user_name:str):
+        
+        uri = f'/v1/user/isloggedin?user_name={user_name}'
+
+        response = self._http_request(url=self.basic_url+uri, headers=self.http_headers, request_type='get')
+        return response.json()
 
     def user_import(self):
         pass
 
-    def user_is_loggined(self):
-        pass
+
 
     
     def pod_new(self, pod_name, password):
