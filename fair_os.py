@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from urllib import request
+from dataclasses import field
+import json
 import requests
 
 
@@ -21,15 +22,18 @@ class FairOs(object):
         kwargs.setdefault('url', url)
         kwargs.setdefault('method', request_type)
         kwargs.setdefault('timeout', self.time_out)
-        kwargs.setdefault('json', json)
+        if json:
+            kwargs.setdefault('json', json)
         kwargs.setdefault('headers', headers)
 
         response = requests.request(*args, **kwargs)
         # print(response.status_code)
         # print(response.url)
+        # print(response.headers)
         # print(response.text)
         # print((response.cookies))
-        # print(dict(response.raw.headers))
+        # print(response.request.headers)
+        # print(response.request.body)
         return response
 
     def user_sign_up(self, user_name:str, passwd:str,mnemonic=''):
@@ -67,6 +71,25 @@ class FairOs(object):
         self.http_headers.update({'Cookie': login_cookie})
         
         return response.json()
+
+    def user_import(self, user_name, password, eth_address):
+        uri = '/v1/user/import'
+        json = {
+            'user_name': user_name,
+            'password': password,
+            'address': eth_address
+        }
+
+        response = self._http_request(url=self.basic_url+uri, headers=self.http_headers)
+        return response.json()
+    
+    def user_present(self, user_name):
+        uri = '/v1/user/present'
+        json = {
+            'user_name': user_name
+        }
+        response = self._http_request(url=self.basic_url+uri, headers=self.http_headers,request_type='get')
+        return response.json()
     
     def user_logout(self):
         """
@@ -87,12 +110,31 @@ class FairOs(object):
         return response.json()
 
 
-    def user_import(self):
-        pass
+    def user_export(self):
+        uri = '/v1/user/export'
+        response = self._http_request(url=self.basic_url+uri, headers=self.http_headers, request_type='post')
+        return response.json()
 
 
-
+    def pod_receiveinfo(self, file_sharing_reference):
+        uri = '/v1/pod/receiveinfo'
+        json = {
+            'reference':file_sharing_reference
+        }
+        response = self._http_request(url=self.basic_url+uri, json=json, headers=self.http_headers)
+        return response.json()
     
+    def pod_receive(self,file_sharing_reference):
+        """
+        make a pod public and share it with others
+        """
+        uri = '/v1/pod/receive'
+        json = {
+            'reference':file_sharing_reference
+        }
+        response = self._http_request(url=self.basic_url+uri, json=json, headers=self.http_headers)
+        return response.json()
+
     def pod_new(self, pod_name, password):
         uri = '/v1/pod/new'
         json = {
@@ -116,11 +158,23 @@ class FairOs(object):
 
     def pod_sync(self, pod_name:str):
         """
-        {'message': 'pod synced successfully', 'code': 200}
+        Syncs the latest contents of the pod from Swarm
         """
         uri = '/v1/pod/sync'
         json = {
             'pod_name': pod_name,
+        }
+        response = self._http_request(url=self.basic_url+uri, json=json, headers=self.http_headers)
+        return response.json()
+    
+    def pod_share(self, pod_name, password):
+        """
+        Shared a pod
+        """
+        uri = '/v1/pod/share'
+        json = {
+            'pod_name': pod_name,
+            'password': password
         }
         response = self._http_request(url=self.basic_url+uri, json=json, headers=self.http_headers)
         return response.json()
@@ -167,6 +221,17 @@ class FairOs(object):
         # print(uri)
         response = self._http_request(url=self.basic_url+uri, headers=self.http_headers, request_type='get')
         return response.json()
+
+    def pod_present(self, pod_name):
+        """
+        Is Pod present
+        """
+        uri = '/v1/pod/present'
+        json = {
+            'pod_name': pod_name,
+        }
+        response = self._http_request(url=self.basic_url+uri, json=json ,headers=self.http_headers, request_type='get')
+        return response.json()
     
     def dir_mkdir(self, pod_name,dir_path):
         """
@@ -178,43 +243,96 @@ class FairOs(object):
             'pod_name': pod_name,
             'dir_path': dir_path
         }
-        
-        headers = {
-            'Cookie': self.login_cookie,
-            'Content-Type':'multipart/form-data',
-        }
+
         response = self._http_request(url=self.basic_url+uri,json=data, headers=self.http_headers, request_type='post')
 
         return response.json()
+    
+    def dir_remove(self,pod_name, dir_path):
+        """
+        remove a directory inside a pod
+        """
+        uri = '/v1/dir/rmdir'
+        data = {
+            'pod_name': pod_name,
+            'dir_path': dir_path,
+        }
+
+        response = self._http_request(url=self.basic_url+uri,json=data, headers=self.http_headers, request_type='delete')
+
+        return response.json()
+
 
     def dir_ls(self,pod_name,dir_path):
-        uri = f'/v1/dir/ls?pod_name={pod_name}&dir_path={dir_path}'
-
-        # data = {
-        #     'dir_path': (None,dir_path),
-        #     'pod_name': (None,pod_name)
-        # }
         
-        headers = {
-            'Cookie': self.login_cookie,
-            'Content-Type':'multipart/form-data',
-        }
+        uri = f'/v1/dir/ls?pod_name={pod_name}&dir_path={dir_path}'
+        
         response = self._http_request(url=self.basic_url+uri,json={}, headers=self.http_headers, request_type='get')
 
         return response.json()
     
     def dir_stat(self, pod_name, dir_path):
         """
-        {'pod_name': 'pod_test_1', 'dir_path': '/', 'dir_name': 'data', 'creation_time': '1646812872', 'modification_time': '1646812872', 'access_time': '1646812872', 'no_of_directories': '0', 'no_of_files': '0'}
+        Show a directory related information
         """
 
         uri = f'/v1/dir/stat?pod_name={pod_name}&dir_path={dir_path}'
-
-        # data = {
-        #     'dir_path': (None,dir_path),
-        #     'pod_name': (None,pod_name)
-        # }
     
         response = self._http_request(url=self.basic_url+uri,json={}, headers=self.http_headers, request_type='get')
 
         return response.json()
+    
+    def dir_present(self, pod_name, dir_path):
+        """
+        Is directory present
+        """
+        uri = f'/v1/dir/present?pod_name={pod_name}&dir_path={dir_path}'
+    
+        response = self._http_request(url=self.basic_url+uri,json={}, headers=self.http_headers, request_type='get')
+
+        return response.json()
+
+
+    def file_upload(self, pod_name, pod_dir, block_size, file_path):
+        """
+        upload a file to dfs
+
+        file_list = ['file_name_1','file_name_2']
+        {"username": ('username.txt', open('1.txt','r')), "password": (None, "abcd1234"),"location":('location.txt','福田区'),"picture":('1.jpg',open(r'C:\\Users\\1.jpg','rb'))}
+        """
+        uri = '/v1/file/upload'
+
+        data = {
+            'pod_name': pod_name,
+            'dir_path': pod_dir,
+            'block_size': block_size,
+        }
+        f = open(file_path, 'rb')
+        # print(f"file_path {file_path} {f.read()}")
+        files = {'files':open(file_path, 'rb')}
+        # files = {'files': b'sdfsdfsdf'}
+        headers = self.http_headers
+
+        headers.update({'fairOS-dfs-Compression':'snappy'})
+        del headers['Content-Type']
+
+        response = self._http_request(url=self.basic_url+uri, headers=headers,params=data,files=files)
+
+        return response.json()
+    
+    def file_download(self, pod_name, file_path):
+        """
+        Download a file from the pod tp the local dir
+        """
+        uri = '/v1/file/download'
+
+        data = {
+            'pod_name': pod_name,
+            'file_path': file_path,
+        }
+ 
+        headers = self.http_headers
+
+        response = self._http_request(url=self.basic_url+uri, headers=headers,params=data)
+
+        return response.text
