@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
+from urllib import request
 import requests
 
 
@@ -31,6 +33,7 @@ class FairOs(object):
         # print(response.text)
         # print((response.cookies))
         # print(response.request.headers)
+        # print(response.request.)
         # print(response.request.body)
         return response
 
@@ -228,7 +231,7 @@ class FairOs(object):
         json = {
             'pod_name': pod_name,
         }
-        response = self._http_request(url=self.basic_url+uri, json=json ,headers=self.http_headers, request_type='get')
+        response = self._http_request(url=self.basic_url+uri, params=json ,headers=self.http_headers, request_type='get')
         return response.json()
     
     def dir_mkdir(self, pod_name,dir_path):
@@ -334,3 +337,240 @@ class FairOs(object):
         response = self._http_request(url=self.basic_url+uri, headers=headers,params=data)
 
         return response.text
+    
+    def file_share(self,pod_name, pod_path_file, dest_user):
+        """
+        Share a file with another user
+        """
+
+        uri = '/v1/file/share'
+
+        data = {
+            'pod_name': pod_name,
+            'pod_path_file': pod_path_file,
+            'dest_user': dest_user,# eth address 
+        }
+ 
+        headers = self.http_headers
+
+        response = self._http_request(url=self.basic_url+uri, headers=headers,params=data)
+
+        return response.json()
+    
+    def file_receive(self, pod_name, sharing_ref, dir_path):
+        """
+        Receive file that was shared by another user
+        """
+        uri = '/v1/file/receive'
+
+        data = {
+            'pod_name': pod_name,
+            'sharing_ref': sharing_ref,
+            'dir_path': dir_path,# eth address 
+        }
+
+        response = self._http_request(url=self.basic_url+uri, headers=self.http_headers,request_type='get',params=data)
+
+        return response.json()
+    
+    def file_receive_info(self, pod_name, sharing_ref):
+        """
+        Receive file info that is being shared by another user
+        """
+        uri = '/v1/file/receiveinfo'
+
+        data = {
+            'pod_name': pod_name,
+            'sharing_ref': sharing_ref,
+        }
+
+        response = self._http_request(url=self.basic_url+uri, headers=self.http_headers,request_type='get',params=data)
+
+        return response.json()
+
+    def file_delete(self, pod_name, file_path):
+        """
+        Delete a file in the pod
+        """
+        uri = '/v1/file/delete'
+
+        data = {
+            'pod_name': pod_name,
+            'file_path': file_path,
+        }
+
+        response = self._http_request(url=self.basic_url+uri, json=data,headers=self.http_headers,request_type='delete')
+
+        return response.json()
+
+    def file_stat(self, pod_name, file_path):
+        """
+        Get the information about a file in the pod
+        """
+        uri = '/v1/file/stat'
+
+        data = {
+            'pod_name': pod_name,
+            'file_path': file_path,
+        }
+
+        response = self._http_request(url=self.basic_url+uri, headers=self.http_headers,request_type='get', params=data)
+
+        return response.json()
+    
+    def kv_new(self, pod_name, table_name, indexType):
+        """
+        Create a new key value table
+        indexType: "string" | number
+        """
+        uri = '/v1/kv/new'
+
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+            'indexType': indexType,
+        }
+        response = self._http_request(url=self.basic_url+uri, json=data, headers=self.http_headers)
+
+        return response.json()
+    
+    def kv_list_tables(self, pod_name):
+        """
+        List all the Key Value tables of this pod
+        """
+        uri = '/v1/kv/ls'
+
+        data = {
+            'pod_name': pod_name
+        }
+        response = self._http_request(url=self.basic_url+uri, headers=self.http_headers,request_type='get',params=data)
+
+        return response.json()
+    
+    def kv_open_table(self, pod_name, table_name):
+        """
+        Opens a already created key value table
+        """
+        uri = '/v1/kv/open'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+        }
+        response = self._http_request(url=self.basic_url+uri, headers=self.http_headers, json=data)
+
+        return response.json()
+    
+    def kv_count_table(self, pod_name, table_name):
+        """
+        Count KV pairs in a table
+        """
+        uri = '/v1/kv/count'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+        }
+        response = self._http_request(url=self.basic_url+uri,json=data,headers=self.http_headers)
+
+        return response.json()
+    
+    def kv_delete_table(self, pod_name, table_name):
+        """
+        Delete a KV table of a pod
+        """
+        uri = '/v1/kv/delete'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+        }
+        response = self._http_request(url=self.basic_url+uri,json=data,headers=self.http_headers,request_type='delete')
+
+        return response.json()
+    
+    def kv_put(self, pod_name, table_name, key, value):
+        """
+        Inserts a Key Value pair in the table
+        """
+        uri = '/v1/kv/entry/put'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+            'key': key,
+            'value': value,
+        }
+        response = self._http_request(url=self.basic_url+uri,json=data,headers=self.http_headers)
+
+        return response.json()
+
+    def doc_db_create(self, pod_name, table_name, si, mutable=True):
+        """
+        create a document DB with the given fields as indexes
+        """
+        uri = '/v1/doc/new'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+            'si': si,
+            'mutable': mutable
+        }
+
+        response = self._http_request(url=self.basic_url+uri,json=data,headers=self.http_headers)
+
+        return response.json()
+    
+    def doc_db_ls(self, pod_name):
+        uri = '/v1/doc/ls'
+        data = {
+            'pod_name': pod_name,
+        }
+
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers, request_type='get',params=data)
+
+        return response.json()
+    
+    def doc_db_open(self, pod_name, table_name):
+        uri = '/v1/doc/open'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+        }
+
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers, json=data,request_type='post')
+
+        return response.json()
+
+    def doc_db_delete(self, pod_name, table_name):
+        uri = '/v1/doc/delete'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+        }
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers, json=data,request_type='delete')
+
+        return response.json()
+
+    def doc_db_find(self, pod_name, table_name, expr, limit):
+        uri = '/v1/doc/find'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+            'expr': expr,
+            'limit': limit,
+        }
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers, json=data,request_type='get')
+
+        return response.json()
+    
+    def doc_db_load_json(self, pod_name, table_name):
+        uri = '/v1/doc/loadjson'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+        }
+
+        headers = self.http_headers
+
+        # headers.update({'fairOS-dfs-Compression':'snappy'})
+        headers['Content-Type'] = 'multipart/form-data'
+        response = self._http_request(url=self.basic_url+uri,headers=headers, json=data)
+
+        return response.json()
