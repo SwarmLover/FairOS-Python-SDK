@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from importlib.metadata import files
 import json
 from urllib import request
 import requests
@@ -500,6 +501,103 @@ class FairOs(object):
         response = self._http_request(url=self.basic_url+uri,json=data,headers=self.http_headers)
 
         return response.json()
+    
+    def kv_get(self, pod_name, table_name,key):
+        """
+        Get value given a key
+        """
+        uri = '/v1/kv/entry/get'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+            'key': key,
+        }
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers,request_type='get',params=data)
+
+        return response.json()
+    
+    def kv_get_data(self, pod_name, table_name, key,format='string'):
+        """
+        format string or byte-string
+        """
+        uri = '/v1/kv/entry/get-data'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+            'key': key,
+            'format': format
+        }
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers,request_type='get',params=data)
+
+        return response.json()
+
+    def kv_delete(self, pod_name, table_name, key):
+        """
+        Delete a KV pair given a key
+        """
+        uri = '/v1/kv/entry/del'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+            'key': key,
+        }
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers,json=data,request_type='delete')
+
+        return response.json()
+    
+    def kv_seek_key(self, pod_name, table_name, start_prefix, end_prefix, limit=0):
+        """
+        Seek a KV pair given a key or its prefix
+        """
+        uri = '/v1/kv/seek'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+            'start_prefix': start_prefix,
+            'end_prefix': end_prefix,
+            'limit': limit,
+        }
+       
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers,json=data)
+
+        return response.json()
+    
+    def kv_get_next(self, pod_name, table_name):
+        uri = '/v1/kv/seek/next'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+        }
+       
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers,request_type='get',params=data)
+
+        return response.json()
+    
+    def kv_loadcsv(self, pod_name, table_name, memory=0):
+        uri = '/v1/kv/loadcsv'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+        }
+
+        if memory:
+            data['memeory'] = memory
+        headers = self.http_headers
+        headers['Content-Type'] = 'multipart/form-data'
+        response = self._http_request(url=self.basic_url+uri,headers=headers,params=data)
+
+        return response.json()
+    
+    def kv_key_present(self, pod_name, table_name, key):
+        uri = '/v1/kv/present'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+            'key': key,
+        }
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers,params=data, request_type='get')
+
+        return response.json()
 
     def doc_db_create(self, pod_name, table_name, si, mutable=True):
         """
@@ -534,6 +632,17 @@ class FairOs(object):
             'table_name': table_name,
         }
 
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers, json=data,request_type='post')
+
+        return response.json()
+    
+    def doc_count(self, pod_name, table_name, expr):
+        uri = '/v1/doc/count'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+            'expr': expr,
+        }
         response = self._http_request(url=self.basic_url+uri,headers=self.http_headers, json=data,request_type='post')
 
         return response.json()
@@ -572,5 +681,44 @@ class FairOs(object):
         # headers.update({'fairOS-dfs-Compression':'snappy'})
         headers['Content-Type'] = 'multipart/form-data'
         response = self._http_request(url=self.basic_url+uri,headers=headers, json=data)
+
+        return response.json()
+    
+    def doc_db_index_json(self, pod_name, table_name, file):
+        uri = '/v1/doc/indexjson'
+        data  = {
+            'pod_name': pod_name,
+            'tabel_name': table_name,
+            'file': file,
+        }
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers, json=data)
+
+        return response.json()
+    
+    def doc_insert(self, pod_name, table_name, doc):
+        """
+        Insert the document in the documentDB
+        """
+        uri = '/v1/doc/entry/put'
+        data = {
+            'pod_name': pod_name,
+            'tabel_name': table_name,
+            'doc': foc,
+        }
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers, json=data)
+
+        return response.json()
+    
+    def doc_get(self, pod_name, table_name, doc_id):
+        """
+        Get the document from the documentDB given the id
+        """
+        uri = '/v1/doc/entry/get'
+        data = {
+            'pod_name': pod_name,
+            'table_name': table_name,
+            'id': doc_id,
+        }
+        response = self._http_request(url=self.basic_url+uri,headers=self.http_headers, json=data, request_type='get')
 
         return response.json()
