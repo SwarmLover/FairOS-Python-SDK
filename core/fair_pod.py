@@ -1,16 +1,19 @@
-from logging import raiseExceptions
-from fair_os import FairOs
+from .fair_os import FairOs
 
 class FairPod(object):
 
-    def __init__(self, user_name, passwd) -> None:
+    def __init__(self, user_name, 
+        passwd,
+        basic_url='http://localhost:9090', 
+        time_out=20) -> None:
+        
         self.fair_os = FairOs()
         self.user_name = user_name
         self.passwd = passwd
 
         result = self.fair_os.user_login(user_name=user_name, passwd=passwd)
         if result['code'] != 200:
-            raiseExceptions(f"user_login failed! {result}")
+            raise Exception(f"user_login failed! {result}")
         
     
     def __del__(self):
