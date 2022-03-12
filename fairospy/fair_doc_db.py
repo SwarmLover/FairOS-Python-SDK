@@ -1,6 +1,6 @@
 from cmath import exp
-from core.fair_os import FairOs
-from core.base_obj import FairBase
+from .core.fair_os import FairOs
+from .core.base_obj import FairBase
 
 class FairDocDB(FairBase):
 

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fairos-py-sdk",
-    version="0.0.1",
+    version="0.0.2",
     author="jusonalien",
     author_email="jusonalien@qq.com",
     description="a python SDK for FairOS",
