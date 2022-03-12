@@ -1,4 +1,3 @@
-from cmath import exp
 from .core.fair_os import FairOs
 from .core.base_obj import FairBase
 
@@ -10,7 +9,7 @@ class FairDocDB(FairBase):
         basic_url='http://localhost:9090', 
         time_out=20) -> None:
 
-        self.fair_os = FairOs()
+        self.fair_os = FairOs(basic_url=basic_url, time_out=time_out)
         assert user_name
         self.user_name = user_name
         assert passwd

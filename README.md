@@ -25,3 +25,7 @@ pip install fairos-py-sdk
    'indexes': ['StringIndex'],
    'type': 'KV Store'}]}
 ```
+
+# License
+
+[MIT](/LICENSE)
