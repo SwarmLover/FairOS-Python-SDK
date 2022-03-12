@@ -28,6 +28,7 @@ author = 'jusonalien'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.autodoc'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -60,3 +61,5 @@ source_suffix = ['.rst', '.md']
 import os
 import sys
 sys.path.insert(0, os.path.abspath('./../fairospy'))
+
+
