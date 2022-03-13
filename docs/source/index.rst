@@ -6,15 +6,8 @@
 Welcome to fairos-py-sdk's documentation!
 =========================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+## FairKV
 
+## FairDocDB
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+## FairFS

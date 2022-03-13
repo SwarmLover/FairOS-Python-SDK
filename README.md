@@ -1,5 +1,5 @@
 # FairOS-Python-SDK
-A simple, elegant Python SDK for FairOS, you can use it to interactive with [FairOS-API](https://docs.fairos.fairdatasociety.org/api/) simply
+A simple, elegant Python SDK for FairOS, you can easily use it to interactive with [FairOS-API](https://docs.fairos.fairdatasociety.org/api/)
 
 
 # Requirements
@@ -25,6 +25,14 @@ pip install fairos-py-sdk
    'indexes': ['StringIndex'],
    'type': 'KV Store'}]}
 ```
+
+# API Doc
+
+- [3 Main Classes](/docs/api_doc.md)
+
+# Contributor
+
+- [jusonalien](https://github.com/jusonalien)
 
 # License
 
