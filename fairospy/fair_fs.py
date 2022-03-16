@@ -36,6 +36,15 @@ class FairFS(FairBase):
     def rm_dir(self, dir_path):
 
         return self.fair_os.dir_remove(pod_name=self.pod_name, dir_path=dir_path)
+    
+    def stat_dir(self, dir_path):
+
+        return self.fair_os.dir_stat(pod_name=self.pod_name, dir_path=dir_path)
+
+    def present_dir(self, dir_path):
+
+        return self.fair_os.dir_present(pod_name=self.pod_name, dir_path=dir_path)
+    
 
     def ls(self,dir_path):
         

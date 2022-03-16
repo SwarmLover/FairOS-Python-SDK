@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from importlib.metadata import files
-import json
-from urllib import request
 import requests
 
 
