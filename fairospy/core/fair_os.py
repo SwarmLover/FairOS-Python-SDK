@@ -700,7 +700,7 @@ class FairOs(object):
         data = {
             'pod_name': pod_name,
             'tabel_name': table_name,
-            'doc': foc,
+            'doc': doc,
         }
         response = self._http_request(url=self.basic_url+uri,headers=self.http_headers, json=data)
 

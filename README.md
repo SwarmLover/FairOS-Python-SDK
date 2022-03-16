@@ -4,9 +4,9 @@ A simple, elegant Python SDK for FairOS, you can easily use it to interactive wi
 
 # Requirements
 - Python 3.8+
-- FairOS http service
+- [FairOS http service](https://docs.fairos.fairdatasociety.org/docs/)
 
-# How to use
+# How to install
 
 ```
 pip install fairos-py-sdk
